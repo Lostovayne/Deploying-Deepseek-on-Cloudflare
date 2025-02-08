@@ -1,0 +1,17 @@
+"$schema" = "node_modules/wrangler/config-schema.json"
+name = "ai-chat"
+main = "src/index.ts"
+compatibility_date = "2025-01-29"
+
+[observability]
+enabled = true
+
+[ai]
+binding = "AI"
+
+[vars]
+CLOUDFLARE_ACCOUNT = "idaccount"
+
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "embeddings-index" # name of your Cloudflare AI index
