@@ -2,26 +2,22 @@
 
 **ai-chat** es un proyecto de chat impulsado por inteligencia artificial, diseñado para ejecutarse en Cloudflare Workers utilizando el framework [Hono](https://github.com/honojs/hono) y la biblioteca [ai](https://www.npmjs.com/package/ai). El proyecto integra un modelo de Hugging Face a través del proveedor [workers-ai-provider](https://www.npmjs.com/package/workers-ai-provider) para generar respuestas automatizadas, haciendo especial énfasis en brindar ejemplos prácticos de código con TailwindCSS.
 
----
-
-## Tabla de Contenidos
-
-- [Características](#características)
-- [Tecnologías Utilizadas](#tecnologías-utilizadas)
-- [Instalación](#instalación)
-- [Configuración](#configuración)
-- [Uso](#uso)
-  - [Modo de Desarrollo](#modo-de-desarrollo)
-  - [Despliegue](#despliegue)
-- [Estructura del Proyecto](#estructura-del-proyecto)
-- [Scripts Disponibles](#scripts-disponibles)
-- [Detalles de la Configuración](#detalles-de-la-configuración)
-- [Contribuir](#contribuir)
-- [Licencia](#licencia)
-- [Contacto](#contacto)
-- [Roadmap y Features Pendientes](#roadmap-y-features-pendientes)
-
----
+## Table of Contents
+1. [Características](#características)
+2. [Tecnologías Utilizadas](#tecnologías-utilizadas)
+3. [Instalación](#instalación)
+4. [Configuración](#configuración)
+5. [Despliegue](#despliegue)
+6. [Uso](#uso)
+7. [API Endpoints](#api-endpoints)
+8. [Testing with Postman](#testing-with-postman)
+9. [Estructura del Proyecto](#estructura-del-proyecto)
+10. [Scripts Disponibles](#scripts-disponibles)
+11. [Detalles de la Configuración](#detalles-de-la-configuración)
+12. [Contribuir](#contribuir)
+13. [Licencia](#licencia)
+14. [Contacto](#contacto)
+15. [Roadmap y Features Pendientes](#roadmap-y-features-pendientes)
 
 ## Características
 
@@ -30,8 +26,6 @@
 - **Inteligencia Artificial**: Generación de texto basada en modelos de Hugging Face.
 - **Ejemplos con TailwindCSS**: Las respuestas generadas incluyen ejemplos de código y clases de TailwindCSS, facilitando el aprendizaje interactivo.
 - **Configuración Flexible**: Utiliza Wrangler para el despliegue en Cloudflare y TypeScript para garantizar robustez en el desarrollo.
-
----
 
 ## Tecnologías Utilizadas
 
@@ -43,8 +37,6 @@
 | workers-ai-provider         | ^0.0.10                                | Proveedor para integrar modelos de Hugging Face en Cloudflare Workers |
 | TypeScript                  | -                                      | Lenguaje que añade tipado estático a JavaScript                     |
 | Wrangler                    | ^3.107.2                               | Herramienta para desarrollar y desplegar Cloudflare Workers         |
-
----
 
 ## Instalación
 
@@ -67,8 +59,6 @@
    # o si usas Yarn:
    yarn install
    ```
-
----
 
 ## Configuración
 
@@ -108,7 +98,15 @@ El proyecto requiere la configuración de algunas variables y bindings para func
 - **Archivos ignorados**  
   El archivo `.gitignore` evita que se incluyan archivos o carpetas que no deben versionarse (por ejemplo, `dist/`, `node_modules/`, configuraciones específicas de desarrollo, etc.).
 
----
+## Despliegue
+
+Para desplegar la aplicación en Cloudflare Workers, utiliza el siguiente comando:
+
+```bash
+npm run deploy
+```
+
+Este comando minifica el código y realiza el despliegue utilizando Wrangler.
 
 ## Uso
 
@@ -156,17 +154,15 @@ npm run dev
 
 Este comando inicia el entorno de Wrangler en modo desarrollo, permitiendo realizar pruebas locales.
 
-### Despliegue
+## API Endpoints
 
-Para desplegar la aplicación en Cloudflare Workers, utiliza el siguiente comando:
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| /insert  | POST   | Adds a new request to the database. |
 
-```bash
-npm run deploy
-```
+## Testing with Postman
 
-Este comando minifica el código y realiza el despliegue utilizando Wrangler.
-
----
+- Instructions for testing the API with Postman.
 
 ## Estructura del Proyecto
 
@@ -183,8 +179,6 @@ ai-chat/
     └── index.ts              # Punto de entrada de la aplicación con rutas definidas
 ```
 
----
-
 ## Scripts Disponibles
 
 Los siguientes scripts están definidos en el archivo `package.json`:
@@ -194,8 +188,6 @@ Los siguientes scripts están definidos en el archivo `package.json`:
 | `npm run dev`  | Inicia el entorno de desarrollo con Wrangler en modo dev         |
 | `npm run deploy` | Despliega la aplicación en Cloudflare Workers, aplicando minificación |
 | `npm run cf-typegen` | Genera definiciones de tipos para los bindings de Cloudflare Workers |
-
----
 
 ## Detalles de la Configuración
 
@@ -219,8 +211,6 @@ El archivo `tsconfig.json` incluye configuraciones importantes para el uso de Ty
 - **types**: Incluye los tipos para Cloudflare Workers
 - **jsx**: Configuración para JSX utilizando `hono/jsx`
 
----
-
 ## Contribuir
 
 ¡Las contribuciones son bienvenidas! Si deseas colaborar en el proyecto, sigue estos pasos:
@@ -230,6 +220,16 @@ El archivo `tsconfig.json` incluye configuraciones importantes para el uso de Ty
 3. Realiza tus cambios y asegúrate de que todas las pruebas pasen.
 4. Envía un Pull Request describiendo en detalle los cambios realizados.
 
+## Licencia
+
+Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+
+## Contacto
+
+Para dudas, sugerencias o colaboración, por favor contacta a:
+
+- **Autor/Equipo de Desarrollo**: [Deus lo vult](mailto:tu.email@dominio.com)
+- **Repositorio**: [https://github.com/LostoVayne/ai-chat](https://github.com/LostoVayne/ai-chat)
 
 ## Roadmap y Features Pendientes
 
@@ -245,23 +245,3 @@ A continuación se muestra una lista de funcionalidades y mejoras previstas para
 - [ ] **Implementar Pruebas Unitarias e Integración ✅**: Desarrollar un conjunto robusto de tests que asegure la calidad y fiabilidad del código.
 - [ ] **Configurar Integración Continua (CI/CD) 🔄**: Establecer pipelines de CI/CD para automatizar pruebas y despliegues, garantizando actualizaciones estables.
 - [ ] **Optimización del Rendimiento ⚡**: Realizar ajustes y mejoras para optimizar el uso de recursos y acelerar la respuesta del sistema.
-
----
-
-
----
-
-## Licencia
-
-Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
-
----
-
-## Contacto
-
-Para dudas, sugerencias o colaboración, por favor contacta a:
-
-- **Autor/Equipo de Desarrollo**: [Deus lo vult](mailto:tu.email@dominio.com)
-- **Repositorio**: [https://github.com/LostoVayne/ai-chat](https://github.com/LostoVayne/ai-chat)
-
----
