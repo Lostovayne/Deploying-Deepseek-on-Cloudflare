@@ -23,8 +23,7 @@ app.post("/generate", async (c) => {
     try {
       const result = streamText({
         model: workersai(c.env.AI_MODEL),
-        system:
-          "Responde de manera clara y concisa y siempre en español. \n Una vez lista tu respuesta, preguntate a ti mismo , ¿Es correcta esta respuesta? , en caso de no serlo mejora correctamente la misma, si esta correcta y validada solo la devuelves.",
+        system: "Eres un Agente que ayuda en la codificacion de codigo de alta calidad",
         prompt: prompt,
         experimental_transform: smoothStream(),
       });
