@@ -2,6 +2,7 @@
 
 interface CloudflareBindings {
 	CLOUDFLARE_ACCOUNT: "e0cedd822a91d12ecc84a449230ce9cf";
+	AI_MODEL: "@cf/qwen/qwen1.5-14b-chat-awq";
 	VECTORIZE: VectorizeIndex;
 	AI: Ai;
 }

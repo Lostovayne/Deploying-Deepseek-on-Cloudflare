@@ -8,18 +8,21 @@ interface EmbeddingResponse {
   data: number[][];
 }
 
-const app = new Hono<{ Bindings: CloudflareBindings }>();
+interface Envs extends CloudflareBindings {
+  AI: Ai;
+}
+
+const app = new Hono<{ Bindings: Envs }>();
 
 app.use("*", cors());
 
 app.post("/generate", async (c) => {
   let prompt = await c.req.text();
-
   {
     const workersai = createWorkersAI({ binding: c.env.AI });
     try {
       const result = streamText({
-        model: workersai("@cf/deepseek-ai/deepseek-r1-distill-qwen-32b"),
+        model: workersai(c.env.AI_MODEL),
         system:
           "Responde de manera clara y concisa y siempre en español. \n Una vez lista tu respuesta, preguntate a ti mismo , ¿Es correcta esta respuesta? , en caso de no serlo mejora correctamente la misma, si esta correcta y validada solo la devuelves.",
         prompt: prompt,
@@ -41,6 +44,21 @@ app.post("/generate", async (c) => {
 
 app.post("/insert", async (c) => {
   // Agregar solicitudes a la base de datos o Api correspondiente para generar contexto nuevo
+  let dataRequest = await c.req.text();
+  const response = await c.env.AI.run("@cf/baai/bge-large-en-v1.5", {
+    text: dataRequest,
+  });
+
+  let vectors: VectorizeVector[] = [];
+  let id = 1;
+
+  response.data.forEach((vector) => {
+    vectors.push({ id: `${id}`, values: vector });
+    id++;
+  });
+
+  let inserted = await c.env.VECTORIZE.upsert(vectors);
+  return c.json({ inserted }, { status: 200 });
 });
 
 export default app;
