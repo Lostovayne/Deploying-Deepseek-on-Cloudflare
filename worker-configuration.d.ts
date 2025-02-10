@@ -2,7 +2,8 @@
 
 interface CloudflareBindings {
 	CLOUDFLARE_ACCOUNT: "e0cedd822a91d12ecc84a449230ce9cf";
-	AI_MODEL: "@cf/qwen/qwen1.5-14b-chat-awq";
+	AI_MODEL: "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b";
+	EMBEDDING_MODEL: "@cf/baai/bge-large-en-v1.5";
 	VECTORIZE: VectorizeIndex;
 	AI: Ai;
 }

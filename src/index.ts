@@ -1,5 +1,5 @@
 import { smoothStream, streamText } from "ai";
-import { Hono } from "hono";
+import { Context, Hono } from "hono";
 import { cors } from "hono/cors";
 import { createWorkersAI } from "workers-ai-provider";
 
@@ -23,7 +23,8 @@ app.post("/generate", async (c) => {
     try {
       const result = streamText({
         model: workersai(c.env.AI_MODEL),
-        system: "Eres un Agente que ayuda en la codificacion de codigo de alta calidad",
+        system:
+          "Eres un Agente que ayuda en la codificacion de codigo de alta calidad. Tus respuestas deben ser lo mas breves posibles y claras que puedas. Trata de no pasar los 200 o 300 caracteres",
         prompt: prompt,
         experimental_transform: smoothStream(),
       });
@@ -44,7 +45,7 @@ app.post("/generate", async (c) => {
 app.post("/insert", async (c) => {
   // Agregar solicitudes a la base de datos o Api correspondiente para generar contexto nuevo
   let dataRequest = await c.req.text();
-  const response = await c.env.AI.run("@cf/baai/bge-large-en-v1.5", {
+  const response = await c.env.AI.run(c.env.EMBEDDING_MODEL, {
     text: dataRequest,
   });
 
@@ -55,9 +56,21 @@ app.post("/insert", async (c) => {
     vectors.push({ id: `${id}`, values: vector });
     id++;
   });
-
   let inserted = await c.env.VECTORIZE.upsert(vectors);
   return c.json({ inserted }, { status: 200 });
 });
+
+const searchQuery = async (c: Context, query: string) => {
+  const queryVector: EmbeddingResponse = await c.env.AI.run(
+    c.env.EMBEDDING_MODEL,
+    {
+      text: [query],
+    }
+  );
+  let matches = await c.env.VECTORIZE.query(queryVector.data[0], {
+    topK: 1,
+  });
+  return c.json(matches, { status: 200 });
+};
 
 export default app;
