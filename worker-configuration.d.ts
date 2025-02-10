@@ -2,10 +2,11 @@
 
 interface CloudflareBindings {
 	CLOUDFLARE_ACCOUNT: "e0cedd822a91d12ecc84a449230ce9cf";
-	AI_MODEL: "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b";
-	EMBEDDING_MODEL: "@cf/baai/bge-large-en-v1.5";
+	AI_MODEL_CLOUDFLARE: "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b";
+	EMBEDDING_MODEL: "@cf/baai/bge-base-en-v1.5";
+	GOOGLE_GEMINI_API_KEY: "xdddd";
+	AI_MODEL_GEMINI: "gemini-2.0-flash-thinking-exp-01-21";
 	DB: D1Database;
 	VECTORIZE: VectorizeIndex;
 	AI: Ai;
-	RAG_WORKFLOW: Workflow;
 }

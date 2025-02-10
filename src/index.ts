@@ -1,72 +1,51 @@
-import { smoothStream, streamText } from "ai";
-import { Context, Hono } from "hono";
-import { cors } from "hono/cors";
-import { createWorkersAI } from "workers-ai-provider";
-
-interface EmbeddingResponse {
-  shape: number[];
-  data: number[][];
-}
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { Redis } from "@upstash/redis/cloudflare";
+import { Hono } from "hono";
+import { getChatResponseFromD1, saveChatToD1 } from "./services/dbService";
+import { generateEmbedding } from "./services/embeddingService";
+import { saveEmbeddingToVectorize, searchInVectorize } from "./services/vectorizeService";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 
-app.use("*", cors());
+app.post("/chat", async c => {
+  const { question } = await c.req.json();
+  const env = c.env;
 
-app.post("/generate", async (c) => {
-  let prompt = await c.req.text();
-  {
-    const workersai = createWorkersAI({ binding: c.env.AI });
-    try {
-      const result = streamText({
-        model: workersai(c.env.AI_MODEL),
-        system:
-          "Eres un Agente que ayuda en la codificacion de codigo de alta calidad. Tus respuestas deben ser lo mas breves posibles y claras que puedas. Trata de no pasar los 200 o 300 caracteres",
-        prompt: prompt,
-        experimental_transform: smoothStream(),
-      });
+  // Instance Redis and Gemini Ai
+  const redis = new Redis({ url: "URL_DE_UPSTASH", token: "TOKEN" });
+  const gemini = new GoogleGenerativeAI(env.GOOGLE_GEMINI_API_KEY);
 
-      return result.toTextStreamResponse({
-        headers: {
-          "Content-Type": "text/x-unknown",
-          "content-encoding": "identity",
-          "transfer-encoding": "chunked",
-        },
-      });
-    } catch (error) {
-      return new Response("The server is getting up ", { status: 400 });
+  // 🔍 1️⃣ Buscar en Redis (cache rápido)
+  const cachedResponse = await redis.get(question);
+  if (cachedResponse) {
+    return c.json({ response: cachedResponse, fromCache: true });
+  }
+
+  // 🔍 2️⃣ Buscar en Vectorize (preguntas similares)
+  const queryEmbedding = await generateEmbedding(question);
+  const d1_id = await searchInVectorize(env, queryEmbedding);
+
+  if (d1_id) {
+    const response = await getChatResponseFromD1(env, d1_id);
+    if (response) {
+      await redis.set(question, response, { ex: 3600 }); // Guardar en cache por 1h
+      return c.json({ response, fromCache: true });
     }
   }
+
+  // 🧠 3️⃣ Generar respuesta con Gemini => TODO: Agregar el modelo de AI correspondiente
+  const aiResponse = `Respuesta de AI: ${question}`;
+
+  // 💾 4️⃣ Guardar en D1
+  const recordId = await saveChatToD1(env, question, aiResponse);
+
+  // 🟢 5️⃣ Guardar en Vectorize
+  const embedding = await generateEmbedding(aiResponse);
+  await saveEmbeddingToVectorize(env, recordId, question, embedding);
+
+  // 🔥 6️⃣ Guardar en Redis para futuras consultas
+  await redis.set(question, aiResponse, { ex: 3600 });
+  return c.json({ response: aiResponse, fromCache: false });
 });
-
-app.post("/insert", async (c) => {
-  // Agregar solicitudes a la base de datos o Api correspondiente para generar contexto nuevo
-  let dataRequest = await c.req.text();
-  const response = await c.env.AI.run(c.env.EMBEDDING_MODEL, {
-    text: dataRequest,
-  });
-
-  let vectors: VectorizeVector[] = [];
-  let id = 1;
-
-  response.data.forEach((vector) => {
-    vectors.push({ id: `${id}`, values: vector });
-    id++;
-  });
-  let inserted = await c.env.VECTORIZE.upsert(vectors);
-  return c.json({ inserted }, { status: 200 });
-});
-
-async function searchQuery(c: Context, query: string) {
-  const queryVector: EmbeddingResponse = await c.env.AI.run(
-    c.env.EMBEDDING_MODEL,
-    {
-      text: [query],
-    }
-  );
-  let matches = await c.env.VECTORIZE.query(queryVector.data[0], {
-    topK: 1,
-  });
-  return c.json(matches, { status: 200 });
-}
 
 export default app;
