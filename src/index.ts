@@ -8,11 +8,7 @@ interface EmbeddingResponse {
   data: number[][];
 }
 
-interface Envs extends CloudflareBindings {
-  AI: Ai;
-}
-
-const app = new Hono<{ Bindings: Envs }>();
+const app = new Hono<{ Bindings: CloudflareBindings }>();
 
 app.use("*", cors());
 
@@ -60,7 +56,7 @@ app.post("/insert", async (c) => {
   return c.json({ inserted }, { status: 200 });
 });
 
-const searchQuery = async (c: Context, query: string) => {
+async function searchQuery(c: Context, query: string) {
   const queryVector: EmbeddingResponse = await c.env.AI.run(
     c.env.EMBEDDING_MODEL,
     {
@@ -71,6 +67,6 @@ const searchQuery = async (c: Context, query: string) => {
     topK: 1,
   });
   return c.json(matches, { status: 200 });
-};
+}
 
 export default app;

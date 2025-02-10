@@ -4,6 +4,8 @@ interface CloudflareBindings {
 	CLOUDFLARE_ACCOUNT: "e0cedd822a91d12ecc84a449230ce9cf";
 	AI_MODEL: "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b";
 	EMBEDDING_MODEL: "@cf/baai/bge-large-en-v1.5";
+	DB: D1Database;
 	VECTORIZE: VectorizeIndex;
 	AI: Ai;
+	RAG_WORKFLOW: Workflow;
 }
